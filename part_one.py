@@ -7,12 +7,12 @@ import pandas as pd
 import numpy as np
 
 PERSON_NUM = 100
+ROUND_NUM = 1501
 
 # 100个人 初始化每个人100块
-fortune = pd.DataFrame({'fortune': [100 for i in range(PERSON_NUM)]})
+fortune = pd.DataFrame({'fortune': [100 for _ in range(PERSON_NUM)]})
 fortune.index.name = 'id'
-round_id = 1
-result = pd.DataFrame({'1': [100 for i in range(PERSON_NUM)]})  # 保存result
+result = pd.DataFrame({'1': [100 for _ in range(PERSON_NUM)]})  # 保存result
 fortune.index.name = 'id'
 
 
@@ -53,15 +53,16 @@ def draw_bar_graph(data):
 
 
 start_time = time.time()
-for i in range(1, 20):
+round_id = 1  # 画图用
+for i in range(1, ROUND_NUM):
     fortune['fortune'] = get_next_round(fortune['fortune'])
     round_id = round_id + 1
-    # if i % 50 == 0:
-    #     result[str(round_id - 1)] = fortune['fortune']
+    if i % 20 == 0:
+        result[str(round_id - 1)] = fortune['fortune']
 end_time = time.time()
 print('模型用时%.3f秒' % (end_time - start_time))
 
-draw_bar_graph(fortune['fortune'])
+# draw_bar_graph(fortune['fortune'])
 
-# result.to_csv('local/result.csv')
-print('轮次: ', round_id)
+result.to_csv('result/part_one_result.csv')
+# print('轮次: ', round_id)
