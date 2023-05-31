@@ -1,23 +1,22 @@
-# 第一部分: 只考虑随机分配的完全图模型
+# part_one: simple allocation in complete network
 # 每个.py文件叫模块
-import networkx as nx
 from matplotlib import pyplot as plt
 import time
 import pandas as pd
 import numpy as np
 
+# 人数和轮次
 PERSON_NUM = 100
 ROUND_NUM = 1501
-
-# 100个人 初始化每个人100块
-fortune = pd.DataFrame({'fortune': [100 for _ in range(PERSON_NUM)]})
-fortune.index.name = 'id'
-result = pd.DataFrame({'1': [100 for _ in range(PERSON_NUM)]})  # 保存result
-fortune.index.name = 'id'
 
 
 # 分配实验1
 def get_next_round(pre_round):
+    """
+    获取下一轮数据
+    :param pre_round: 前一轮的数据 为pd.Series类型
+    :return: 这一轮的数据 也为pd.Series类型
+    """
     round_person_num = len(pre_round[pre_round > 0])  # 本轮分配的总金额, 没钱的人不拿钱出来
     this_round = pd.DataFrame({'pre_round': pre_round})  # 本轮分配的结果
     this_round['lost'] = np.where(this_round['pre_round'] > 0, 1, 0)  # 仍然有钱的人拿出一块钱来
@@ -32,8 +31,8 @@ def get_next_round(pre_round):
 def draw_bar_graph(data):
     """
     绘制数据的直方图
-    
-    data - pd.Series类型 data.name=fortune
+    :param data: pd.Series类型 data.name=fortune
+    :return:
     """
     sorted_data = pd.DataFrame(data.sort_values()).reset_index()
     plt.figure(figsize=[10, 6])
@@ -52,17 +51,25 @@ def draw_bar_graph(data):
     plt.savefig('pic/part_one/round_%d.png' % round_id, dpi=600)  # 保存图片
 
 
-start_time = time.time()
-round_id = 1  # 画图用
-for i in range(1, ROUND_NUM):
-    fortune['fortune'] = get_next_round(fortune['fortune'])
-    round_id = round_id + 1
-    if i % 20 == 0:
-        result[str(round_id - 1)] = fortune['fortune']
-end_time = time.time()
-print('模型用时%.3f秒' % (end_time - start_time))
+if __name__ == '__main__':
+    # 初始化每个人100块
+    fortune = pd.DataFrame({'fortune': [100 for _ in range(PERSON_NUM)]})
+    fortune.index.name = 'id'
+    result = pd.DataFrame({'1': [100 for _ in range(PERSON_NUM)]})  # 保存result
+    fortune.index.name = 'id'
 
-# draw_bar_graph(fortune['fortune'])
+    start_time = time.time()
 
-result.to_csv('result/part_one_result.csv')
-# print('轮次: ', round_id)
+    round_id = 1  # 画图用
+    for i in range(1, ROUND_NUM):
+        fortune['fortune'] = get_next_round(fortune['fortune'])
+        round_id = round_id + 1
+        if i % 20 == 0:
+            result[str(round_id - 1)] = fortune['fortune']
+
+    end_time = time.time()
+    print('模型用时%.3f秒' % (end_time - start_time))
+
+    # draw_bar_graph(fortune['fortune'])
+    # result.to_csv('result/part_one_result.csv')
+    print(result)
